@@ -92,3 +92,5 @@ config.json
 down/*
 
 zipped/*
+
+.vscode/
