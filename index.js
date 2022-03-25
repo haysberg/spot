@@ -77,7 +77,7 @@ function dl_ytb(interaction) {
 }
 
 function zip(interaction, id){
-	exec(`zip -r ./zipped/${id}.zip /tmp/down/${id}`, (error, stdout, stderr) => {
+	exec(`zip -r /tmp/zipped/${id}.zip /tmp/down/${id}`, (error, stdout, stderr) => {
 		if (error) {
 		  logger.error(`exec error: ${error}`);
 		  interaction.followUp(`❌ ${stderr}`);

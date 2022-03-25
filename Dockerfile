@@ -21,5 +21,8 @@ ENV NODE_ENV=production
 # Bundle app source
 COPY . .
 
+RUN mkdir /tmp/zipped
+RUN mkdir /tmp/down
+
 EXPOSE 8080
 CMD [ "node", "index.js" ]
