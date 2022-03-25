@@ -59,7 +59,7 @@ async function spoutdl(interaction, id) {
 async function dl_ytb(interaction, id) {
 	logger.info(` [${id}] Calling yt-dlp`)
 	
-	proc = spawn('yt-dlp', ['-x', '-P', '/tmp/down/' + id, '--audio-format', 'mp3', '-N', '8', interaction.options.getString('url')])
+	proc = spawn('yt-dlp', ['-x', '-P', '/tmp/down/' + id, '--audio-format', 'mp3', '-N', '8', '-o', '"%(title)s.%(ext)s"' ,interaction.options.getString('url')])
 
 	proc.stdout.on('data', (data) => {
 		logger.info(`[${id}] ${data}`);
