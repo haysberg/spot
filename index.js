@@ -93,7 +93,7 @@ function zip(interaction, id){
 		}
 
 	  });
-	exec(`rm -rf /tmp/down/${id}`);
+	cleanupDownloads();
 }
 
 function sendZipLink(interaction, id){
