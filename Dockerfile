@@ -1,5 +1,9 @@
 FROM node:lts-alpine
 
+RUN apk update
+RUN apk upgrade
+RUN apk add curl ffmpeg
+
 # Create app directory
 WORKDIR /usr/src/app
 
@@ -8,12 +12,19 @@ WORKDIR /usr/src/app
 # where available (npm@5+)
 COPY package*.json ./
 
+COPY config.json ./
+COPY deploy-commands.js ./
+
+RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
+RUN chmod a+rx /usr/local/bin/yt-dlp
+
 RUN npm install
-# If you are building your code for production
-# RUN npm ci --only=production
+ENV NODE_ENV=production
+RUN node ./deploy-commands.js
+
 
 # Bundle app source
 COPY . .
 
 EXPOSE 8080
-CMD [ "NODE_ENV=production", "node", "index.js" ]
+CMD [ "node", "index.js" ]

@@ -15,7 +15,8 @@ const spoutdl = new SlashCommandBuilder()
 
 const commands = [
     new SlashCommandBuilder().setName('ping').setDescription('Replies with pong!'),
-    spoutdl
+    spoutdl,
+    new SlashCommandBuilder().setName('setup').setDescription('Setup webhook'),
 ]
     .map(command => command.toJSON());
 

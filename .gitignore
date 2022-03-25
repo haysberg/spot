@@ -89,3 +89,6 @@ typings/
 .env
 
 config.json
+down/*
+
+zipped/*
