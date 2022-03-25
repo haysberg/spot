@@ -5,6 +5,7 @@ const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 const findRemoveSync = require('find-remove');
 const { exec } = require('child_process');
 var crypto = require("crypto");
+const { spawn } = require('child_process');
 
 const logger = winston.createLogger({
 	level: 'info',
@@ -45,7 +46,7 @@ async function spoutdl(interaction, id) {
 
 	if (url.includes("https://www.youtube.com")) {
 		logger.info(` [${id}] URL is a valid YouTube URL`)
-		interaction.reply(`Downloading your music with id [${id}]`)
+		interaction.reply(`Downloading your music with id [${id}] ➡️ ${url}`)
 		dl_ytb(interaction, id)
 	}
 
@@ -57,12 +58,28 @@ async function spoutdl(interaction, id) {
 
 async function dl_ytb(interaction, id) {
 	logger.info(` [${id}] Calling yt-dlp`)
+	
+	proc = spawn('/usr/local/bin/yt-dlp' ['-x', '-P', '/tmp/down/' + id + ' ' + interaction.options.getString('url')])
+
+	proc.stdout.on('data', (data) => {
+		console.log(`[${id}] ${data}`);
+	});
+	  
+	proc.stderr.on('data', (data) => {
+		logger.error(`[${id}] ${data}`);
+	});
+
+	proc.on('close', (code) => {
+		console.log(`child process exited with code ${code}`);
+	});
+
 	var child = exec('./yt-dlp -x -P /tmp/down/' + id + ' ' + interaction.options.getString('url'), (error, stdout, stderr) => {
 		if (error) {
 		  logger.error(` [${id}] exec error: ${error}`);
 		  interaction.followUp(`❌ ${stderr}`);
 		  interaction.followUp(`Still attempting to zip...`)
 		  zip(interaction, id);
+		  interaction.followUp(`Your music is available : ${process.env.WEBHOST}${id}.zip`)
 		  return;
 		}
 		else{
