@@ -57,10 +57,12 @@ async function spoutdl(interaction, id) {
 
 async function dl_ytb(interaction, id) {
 	logger.info(` [${id}] Calling yt-dlp`)
-	exec('./yt-dlp -x -P /tmp/down/' + id + ' ' + interaction.options.getString('url'), (error, stdout, stderr) => {
+	var child = exec('./yt-dlp -x -P /tmp/down/' + id + ' ' + interaction.options.getString('url'), (error, stdout, stderr) => {
 		if (error) {
 		  logger.error(` [${id}] exec error: ${error}`);
 		  interaction.followUp(`❌ ${stderr}`);
+		  interaction.followUp(`Still attempting to zip...`)
+		  zip(interaction, id);
 		  return;
 		}
 		else{
@@ -80,6 +82,7 @@ async function zip(interaction, id){
 		if (error) {
 		  logger.error(` [${id}] ${error}`);
 		  interaction.followUp(`❌ ${stderr}`);
+		  interaction.followUp(`We tried to zip it anyway :  ${process.env.WEBHOST}${id}.zip`)
 		  return;
 		}
 		else{
@@ -97,6 +100,7 @@ async function zip(interaction, id){
 
 async function sendZipLink(interaction, id){
 	interaction.user.send(`Your music is available : ${process.env.WEBHOST}${id}.zip`)
+	exec(`rm -rf /tmp/down/${id}`)
 }
 
 async function cleanupDownloads(){
