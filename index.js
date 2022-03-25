@@ -31,76 +31,75 @@ client.on('interactionCreate', async interaction => {
 		await interaction.reply('Pong!');
 	} else if (commandName === 'spoutdl') {
 		logger.info('Asked for the spoutdl command')
-		await spoutdl(interaction);
+		var id = crypto.randomBytes(20).toString('hex');
+		logger.info('Generated ID : ' + id)
+		await spoutdl(interaction, id);
 	} else if (commandName == 'setup') {
 		logger.info('Asked for the setup command')
 	}
 });
 
-function spoutdl(interaction) {
+async function spoutdl(interaction, id) {
 	url = interaction.options.getString("url")
-	logger.info("Asking for parsing on URL : " + url)
+	logger.info(` [${id}] Asking for parsing on URL : ${url}`)
 
 	if (url.includes("https://www.youtube.com")) {
-		logger.info("URL is a valid YouTube URL")
-		interaction.reply("Downloading your music...")
-		dl_ytb(interaction)
+		logger.info(` [${id}] URL is a valid YouTube URL`)
+		interaction.reply(`Downloading your music with id [${id}]`)
+		dl_ytb(interaction, id)
 	}
 
 	else{
-		logger.error('URL is not a valid YouTube URL')
+		logger.error(` [${id}] URL is not a valid YouTube URL`)
 		interaction.reply("😥 I'm sorry but this URL is not valid.")
 	}
 }
 
-function dl_ytb(interaction) {
-	var id = crypto.randomBytes(20).toString('hex');
-	logger.info('Generated ID : ' + id)
-
-	logger.info('Calling yt-dlp')
+async function dl_ytb(interaction, id) {
+	logger.info(` [${id}] Calling yt-dlp`)
 	exec('./yt-dlp -x -P /tmp/down/' + id + ' ' + interaction.options.getString('url'), (error, stdout, stderr) => {
 		if (error) {
-		  logger.error(`exec error: ${error}`);
+		  logger.error(` [${id}] exec error: ${error}`);
 		  interaction.followUp(`❌ ${stderr}`);
 		  return;
 		}
 		else{
 			zip(interaction, id);
-			logger.info('Download complete')
+			logger.info(` [${id}] Download complete`)
 		}
-		logger.info(`stdout: ${stdout}`);
+		logger.info(` [${id}] ${stdout}`);
 		if(stderr != ""){
-			logger.error(`stderr: ${stderr}`);
+			logger.error(` [${id}] ${stderr}`);
 		}
 
 	  });
 }
 
-function zip(interaction, id){
+async function zip(interaction, id){
 	exec(`zip -r -j /tmp/zipped/${id}.zip /tmp/down/${id}/*`, (error, stdout, stderr) => {
 		if (error) {
-		  logger.error(`exec error: ${error}`);
+		  logger.error(` [${id}] ${error}`);
 		  interaction.followUp(`❌ ${stderr}`);
 		  return;
 		}
 		else{
-			logger.info('ZIP complete')
+			logger.info(` [${id}] ZIP complete`)
 			sendZipLink(interaction, id);
 		}
-		logger.info(`stdout: ${stdout}`);
+		logger.info(` [${id}] ${stdout}`);
 		if(stderr != ""){
-			logger.error(`stderr: ${stderr}`);
+			logger.error(` [${id}] ${stderr}`);
 		}
 
 	  });
 	cleanupDownloads();
 }
 
-function sendZipLink(interaction, id){
+async function sendZipLink(interaction, id){
 	interaction.user.send(`Your music is available : ${process.env.WEBHOST}${id}.zip`)
 }
 
-function cleanupDownloads(){
+async function cleanupDownloads(){
 	logger.info('🧹 Cleaning up leftover downloads...')
 	findRemoveSync('/tmp/down', {age: {hours: 24}})
 	findRemoveSync('/tmp/zipped', {age: {hours: 24}})

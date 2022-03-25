@@ -11,12 +11,18 @@ const spoutdl = new SlashCommandBuilder()
 .addStringOption(option =>
     option.setName('url')
         .setDescription('URL of YT Video / Playlist, or Spotify Album / Playlist / Song')
-        .setRequired(true));
+        .setRequired(true))
+.addStringOption(option =>
+    option.setName('format')
+        .setDescription('Output file format')
+        .addChoice('mp3', 'mp3')
+		.addChoice('flac', 'flac')
+		.addChoice('opus', 'opus'));
+
 
 const commands = [
     new SlashCommandBuilder().setName('ping').setDescription('Replies with pong!'),
-    spoutdl,
-    new SlashCommandBuilder().setName('setup').setDescription('Setup webhook'),
+    spoutdl
 ]
     .map(command => command.toJSON());
 
