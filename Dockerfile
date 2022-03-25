@@ -2,7 +2,7 @@ FROM node:lts-alpine
 
 RUN apk update
 RUN apk upgrade
-RUN apk add curl ffmpeg python3
+RUN apk add curl ffmpeg python3 zip
 
 # Create app directory
 WORKDIR /usr/src/app
