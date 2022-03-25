@@ -1,7 +1,8 @@
 const winston = require('winston');
 const { Client, Intents } = require('discord.js');
-const { token, webHost } = require('./config.json');
+const { token } = process.env.DISCORD_TOKEN;
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const findRemoveSync = require('find-remove');
 const { exec } = require('child_process');
 var crypto = require("crypto");
 
@@ -59,7 +60,7 @@ function dl_ytb(interaction) {
 	logger.info('Generated ID : ' + id)
 
 	logger.info('Calling yt-dlp')
-	exec('./yt-dlp -x -P ./down/' + id + ' ' + interaction.options.getString('url'), (error, stdout, stderr) => {
+	exec('./yt-dlp -x -P /tmp/down/' + id + ' ' + interaction.options.getString('url'), (error, stdout, stderr) => {
 		if (error) {
 		  logger.error(`exec error: ${error}`);
 		  interaction.followUp(`❌ ${stderr}`);
@@ -78,7 +79,7 @@ function dl_ytb(interaction) {
 }
 
 function zip(interaction, id){
-	exec(`zip -r ./zipped/${id}.zip ./down/${id}`, (error, stdout, stderr) => {
+	exec(`zip -r ./zipped/${id}.zip /tmp/down/${id}`, (error, stdout, stderr) => {
 		if (error) {
 		  logger.error(`exec error: ${error}`);
 		  interaction.followUp(`❌ ${stderr}`);
@@ -94,15 +95,17 @@ function zip(interaction, id){
 		}
 
 	  });
-	//exec(`rm -rf ./down/${id}`);
+	exec(`rm -rf /tmp/down/${id}`);
 }
 
 function sendZipLink(interaction, id){
-	interaction.user.send(`Your music is available : ${webHost}${id}.zip`)
+	interaction.user.send(`Your music is available : ${process.env.WEBHOST}${id}.zip`)
 }
 
 function cleanupDownloads(){
 	logger.info('🧹 Cleaning up leftover downloads...')
+	findRemoveSync('/tmp/down', {age: {hours: 24}})
+	findRemoveSync('/tmp/zipped', {age: {hours: 24}})
 }
 
 setInterval(cleanupDownloads, 1000 * 60 * 60);
