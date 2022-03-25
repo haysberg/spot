@@ -59,10 +59,10 @@ async function spoutdl(interaction, id) {
 async function dl_ytb(interaction, id) {
 	logger.info(` [${id}] Calling yt-dlp`)
 	
-	proc = spawn('/usr/local/bin/yt-dlp' ['-x', '-P', '/tmp/down/' + id + ' ' + interaction.options.getString('url')])
+	proc = spawn('/usr/local/bin/yt-dlp' ['-x', '-P','--audio-format', 'mp3', '/tmp/down/' + id + ' ' + interaction.options.getString('url')])
 
 	proc.stdout.on('data', (data) => {
-		console.log(`[${id}] ${data}`);
+		logger.info(`[${id}] ${data}`);
 	});
 	  
 	proc.stderr.on('data', (data) => {
@@ -70,28 +70,28 @@ async function dl_ytb(interaction, id) {
 	});
 
 	proc.on('close', (code) => {
-		console.log(`child process exited with code ${code}`);
+		logger.info(`[${id}] child process exited with code ${code}`);
 	});
 
-	var child = exec('./yt-dlp -x -P /tmp/down/' + id + ' ' + interaction.options.getString('url'), (error, stdout, stderr) => {
-		if (error) {
-		  logger.error(` [${id}] exec error: ${error}`);
-		  interaction.followUp(`❌ ${stderr}`);
-		  interaction.followUp(`Still attempting to zip...`)
-		  zip(interaction, id);
-		  interaction.followUp(`Your music is available : ${process.env.WEBHOST}${id}.zip`)
-		  return;
-		}
-		else{
-			zip(interaction, id);
-			logger.info(` [${id}] Download complete`)
-		}
-		logger.info(` [${id}] ${stdout}`);
-		if(stderr != ""){
-			logger.error(` [${id}] ${stderr}`);
-		}
+	// var child = exec('./yt-dlp -x -P /tmp/down/' + id + ' ' + interaction.options.getString('url'), (error, stdout, stderr) => {
+	// 	if (error) {
+	// 	  logger.error(` [${id}] exec error: ${error}`);
+	// 	  interaction.followUp(`❌ ${stderr}`);
+	// 	  interaction.followUp(`Still attempting to zip...`)
+	// 	  zip(interaction, id);
+	// 	  interaction.followUp(`Your music is available : ${process.env.WEBHOST}${id}.zip`)
+	// 	  return;
+	// 	}
+	// 	else{
+	// 		zip(interaction, id);
+	// 		logger.info(` [${id}] Download complete`)
+	// 	}
+	// 	logger.info(` [${id}] ${stdout}`);
+	// 	if(stderr != ""){
+	// 		logger.error(` [${id}] ${stderr}`);
+	// 	}
 
-	  });
+	//   });
 }
 
 async function zip(interaction, id){
